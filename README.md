@@ -1,24 +1,30 @@
-# Coffee
-Coffee是一个程序员工具合集，为开发提供多个效率提升工具。
-我们的目标是能够节省更多时间，可以把更多的时间花在喝咖啡上。
+# pycoffee
+`pycoffee` is a toolbox for improving efficiency in dayly works.
+Our goal is to have more time to enjoy coffee! 
+
 
 **Table of contents**
-- [Getting started](#getting-started)
-- [Links](#author)
-- [Contributing](#Contributing)
+- [pycoffee](#pycoffee)
+  - [Getting started](#getting-started)
+  - [Author](#author)
+  - [Contributing](#contributing)
 
 ## Getting started
 
-安装方法：
+how to install:
 
 ```bash
+# use pip to install the latest version
 pip install pycoffee
 ```
 
-使用方法:
+how to use:
 
 ```bash
+# use `--help` to see tools
 cof --help
+
+# show external playbooks
 cof play --help
 ```
 
@@ -27,4 +33,4 @@ tkorays <tkorays@hotmail.com>
 
 
 ## Contributing
-欢迎提issue以及贡献源码。
+Welcome to contribute code!
