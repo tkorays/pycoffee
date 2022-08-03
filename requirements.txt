@@ -1,0 +1,13 @@
+configparser
+pyyaml
+click
+influxdb
+elasticsearch
+requests
+wget
+watchdog
+rich
+ntplib
+pyqt5
+grafanalib
+flask
