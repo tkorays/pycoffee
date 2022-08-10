@@ -1,6 +1,16 @@
-# pycoffee
-`pycoffee` is a toolbox for improving efficiency in dayly works.
-Our goal is to have more time to enjoy coffee! 
+<p align="center">
+  <h2 align="center">☕ pycoffee</h2>
+</p>
+
+<p align="center">
+  Assign your work to the machine and enjoy your coffee!
+</p>
+
+&nbsp;
+
+## description
+`pycoffee` is a toolbox for improving efficiency in daily works.
+Our goal is saving your time and offer you more time to enjoy coffee! 
 
 
 **Table of contents**
