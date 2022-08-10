@@ -1,4 +1,4 @@
-from grafanalib.core import Dashboard, Template, Templating, RowPanel, GridPos, TimeSeries, DEFAULT_TIME_PICKER
+from grafanalib.core import Dashboard, Template, Templating, RowPanel, GridPos, TimeSeries, DEFAULT_TIME_PICKER, Table
 from grafanalib._gen import DashboardEncoder
 from grafanalib.influxdb import InfluxDBTarget
 import json
@@ -31,11 +31,20 @@ class InfluxdbQueryBuilder:
                 self.query(item[0], alias, sel, proc)
         return self
 
-    def build(self, tags: list, interval='1s', fill='none'):
+    def build(self, tags: list, filters: dict = {}, interval='1s', fill='none'):
         query = 'SELECT ' + ' ,'.join(self.fields) + f' from "{self.measurement}" WHERE ('
         query += ' AND '.join([f'"{k}"=~/^${k}$/' for k in tags])
+        query += ' AND '.join([f'"{k}"="{v}"' for k, v in filters.items()])
         query += f') AND $timeFilter GROUP BY time({interval}) fill({fill})'
-        # print(query)
+        return query
+
+    def build_nots(self, tags: list, filters: dict = {}):
+        query = 'SELECT ' + ' ,'.join(self.fields) + f' from "{self.measurement}" WHERE ('
+        query += ' AND '.join([f'"{k}"=~/^${k}$/' for k in tags])
+        if filters:
+            query += ' AND '
+            query += ' AND '.join([f'"{k}"=\'{v}\'' for k, v in filters.items()])
+        query += f') AND $timeFilter'
         return query
 
 
@@ -64,6 +73,18 @@ class GrafanaDashboardBuilder:
         ))
         return self
 
+    def add_query_variable(self, name: str, label: str, query: str):
+        self.templates.append(Template(
+            name=name,
+            default='',
+            query=query,
+            label=label,
+            type='query',
+            includeAll=True,
+            multi=True
+        ))
+        return self
+
     def add_row_panel(self, title: str):
         self.panels.append(RowPanel(title=title, gridPos=GridPos(h=1, w=24, x=self.cur_x, y=self.cur_y)))
         self.cur_x = 0
@@ -80,6 +101,24 @@ class GrafanaDashboardBuilder:
             interval='500ms',
             showPoints='always',
             tooltipMode='multi',
+            gridPos=GridPos(h=8, w=24, x=self.cur_x, y=self.cur_y)
+        ))
+        self.cur_x = 0
+        self.cur_y += 8
+        return self
+
+    def add_influx_table_panel(self, title: str, source: str, influx_query_list, overrides=[]):
+        self.panels.append(Table(
+            title=title,
+            dataSource=source,
+            targets=[
+                InfluxDBTarget(query=x, format='table') for x in influx_query_list
+            ],
+            overrides=overrides,
+            filterable=True,
+            align='auto',
+            displayMode='color-background-solid',
+            colorMode='continuous-BlPu',
             gridPos=GridPos(h=8, w=24, x=self.cur_x, y=self.cur_y)
         ))
         self.cur_x = 0
@@ -116,3 +155,47 @@ class GrafanaDashboardBuilder:
         if result['status'] != 'success':
             return None
         return f'http://{server_addr}{result["url"]}'
+
+    def url(self, server_addr: str):
+        return f'http://{server_addr}/d/{self.title}/{self.uid.lower()}'
+
+    def full_url(self, server_addr: str, vars: dict, dt_from: int, dt_to: int):
+        v = '&'.join([f'var-{k}={v}' for k, v in vars.items()])
+        return f'{self.url(server_addr)}?orgId=1&{v}&from={dt_from}&to={dt_to}'
+
+    @staticmethod
+    def override_hide_field(field):
+        return {
+            "matcher": {
+              "id": "byName",
+              "options": field
+            },
+            "properties": [
+              {
+                "id": "custom.hidden",
+                "value": True
+              }
+            ]
+          }
+
+    @staticmethod
+    def overrides_display_link(link_name, override_field, link_field):
+        return {
+            "matcher": {
+              "id": "byName",
+              "options": override_field
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "targetBlank": False,
+                    "title": link_name,
+                    "url": "${__data.fields." + link_field + "}"
+                  }
+                ]
+              }
+            ]
+          }
+

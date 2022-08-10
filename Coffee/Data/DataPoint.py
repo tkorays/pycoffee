@@ -2,7 +2,7 @@ from datetime import datetime
 
 
 class DataPoint:
-    def __init__(self, name: str, timestamp: datetime, value: dict, tags: list, meta=dict):
+    def __init__(self, name: str, timestamp: datetime, value: dict, tags: list, meta: dict):
         """
         init a datapoint
 

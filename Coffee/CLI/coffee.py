@@ -31,7 +31,6 @@ def coffee_play():
 @click.option('--influxdb_username', type=str, default='', required=False, help='username of InfluxDB')
 @click.option('--influxdb_password', type=str, default='', required=False, help='password of InfluxDB')
 @click.option('--influxdb_database', type=str, default='', required=False, help='InfluxDB database name')
-@click.option('--default_source', type=str, default='', required=False, help='default source')
 @click.option('--local_user', type=str, default='', required=False, help='user name')
 def coffee_config(influxdb_host, influxdb_port, influxdb_username, influxdb_password, influxdb_database,
                   local_user):

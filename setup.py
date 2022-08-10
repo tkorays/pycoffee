@@ -1,5 +1,5 @@
 from setuptools import setup, find_packages
-version = '1.0.1'
+version = '1.0.3'
 
 
 setup(
@@ -20,11 +20,9 @@ setup(
         ]
     },
     install_requires=[
-        'configparser',
         'pyyaml',
         'click',
         'influxdb',
-        'elasticsearch',
         'requests',
         'wget',
         'watchdog',

@@ -1,8 +1,6 @@
-configparser
 pyyaml
 click
 influxdb
-elasticsearch
 requests
 wget
 watchdog
