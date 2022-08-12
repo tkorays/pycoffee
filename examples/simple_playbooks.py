@@ -1,3 +1,6 @@
+# Copyright 2022 tkorays. All Rights Reserved.
+# Licensed to MIT under a Contributor Agreement.
+
 from Coffee.Core.Playbook import Playbook
 from Coffee.Data.TimestampPatterns import DEFAULT_TS_PATTERNS
 from Coffee.Data.DataPattern import PatternGroupBuilder, RegexPattern

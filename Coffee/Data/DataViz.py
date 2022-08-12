@@ -1,3 +1,6 @@
+# Copyright 2022 tkorays. All Rights Reserved.
+# Licensed to MIT under a Contributor Agreement.
+
 from grafanalib.core import Dashboard, Template, Templating, RowPanel, GridPos, TimeSeries, DEFAULT_TIME_PICKER, Table
 from grafanalib._gen import DashboardEncoder
 from grafanalib.influxdb import InfluxDBTarget

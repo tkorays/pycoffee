@@ -1,3 +1,6 @@
+# Copyright 2022 tkorays. All Rights Reserved.
+# Licensed to MIT under a Contributor Agreement.
+
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import QWidget, QApplication, QGridLayout, QMessageBox, QLCDNumber

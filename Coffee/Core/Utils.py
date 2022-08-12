@@ -1,3 +1,6 @@
+# Copyright 2022 tkorays. All Rights Reserved.
+# Licensed to MIT under a Contributor Agreement.
+
 from datetime import datetime
 import getpass
 from Coffee.Core.Settings import DEF_CFG

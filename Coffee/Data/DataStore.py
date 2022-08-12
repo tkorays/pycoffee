@@ -1,3 +1,6 @@
+# Copyright 2022 tkorays. All Rights Reserved.
+# Licensed to MIT under a Contributor Agreement.
+
 import abc
 import os
 import pickle

@@ -1,3 +1,6 @@
+# Copyright 2022 tkorays. All Rights Reserved.
+# Licensed to MIT under a Contributor Agreement.
+
 from Coffee.Data.DataProcessor import DataSink
 from Coffee.Data.DataPoint import DataPoint
 import click

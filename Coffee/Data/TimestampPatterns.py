@@ -1,3 +1,6 @@
+# Copyright 2022 tkorays. All Rights Reserved.
+# Licensed to MIT under a Contributor Agreement.
+
 from Coffee.Data.DataPattern import RegexPattern
 
 DEFAULT_TS_PATTERNS = [
