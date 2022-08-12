@@ -62,6 +62,7 @@ class CoffeeSettings:
     influxdb_database = 'coffee'
     grafana_url = '127.0.0.1:3000'
     grafana_key = ''
+    grafana_influxdb_source = 'InfluxDB'
     local_user = ''
     storage_path = os.path.join(os.path.expanduser('~'), '.coffee')
     plays_path = os.path.join(os.path.expanduser('~'), '.coffee', 'CustomPlays')

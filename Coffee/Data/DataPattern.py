@@ -139,3 +139,31 @@ class RegexPattern(PatternInterface, yaml.YAMLObject):
             success_cnt += 1 if self.match(t) else 0
         print("run [{}] test done {}/{}".format(self.get_unique_id(), success_cnt, len(self.tests)))
         return success_cnt == len(self.tests)
+
+
+class PatternGroupBuilder:
+    """
+    build a pattern group
+    """
+    def __init__(self, name: str):
+        self.group = PatternGroup(name, [], [])
+
+    def set_ts_patterns(self, ts):
+        self.group.ts_patterns = ts
+        return self
+    
+    def set_patterns(self, p):
+        self.group.patterns = p
+        return self
+
+    def add_ts_pattern(self, ts):
+        self.group.ts_patterns.append(ts)
+        return self
+
+    def add_pattern(self, p):
+        self.group.patterns.append(p)
+        return self
+
+    def build(self):
+        return self.group
+

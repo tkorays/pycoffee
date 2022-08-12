@@ -31,6 +31,11 @@ class InfluxdbQueryBuilder:
                 self.query(item[0], alias, sel, proc)
         return self
 
+    def query_list_raw(self, li: list):
+        for item in li:
+            self.fields.append(f'"{item}"')
+        return self
+
     def build(self, tags: list, filters: dict = {}, interval='1s', fill='none'):
         query = 'SELECT ' + ' ,'.join(self.fields) + f' from "{self.measurement}" WHERE ('
         query += ' AND '.join([f'"{k}"=~/^${k}$/' for k in tags])
@@ -73,7 +78,7 @@ class GrafanaDashboardBuilder:
         ))
         return self
 
-    def add_query_variable(self, name: str, label: str, query: str):
+    def add_query_variable(self, name: str, label: str, query: str, datasource: str):
         self.templates.append(Template(
             name=name,
             default='',
@@ -81,7 +86,8 @@ class GrafanaDashboardBuilder:
             label=label,
             type='query',
             includeAll=True,
-            multi=True
+            multi=True,
+            dataSource=datasource
         ))
         return self
 
