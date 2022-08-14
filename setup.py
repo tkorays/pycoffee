@@ -3,7 +3,7 @@ version = '1.0.3'
 
 
 setup(
-    name="coffee",
+    name="pycoffee",
     version=version,
     description="coffee tools",
     author="tkorays",
