@@ -5,7 +5,14 @@
 <p align="center">
   Assign your work to the machine and enjoy coffee!
 </p>
-
+<p align="center">
+	<a href="https://github.com/tkorays/pycoffee/stargazers">
+		<img alt="Stars" src="https://img.shields.io/github/stars/tkorays/pycoffee?style=for-the-badge&logo=starship&color=F3B562&logoColor=D9E0EE&labelColor=302D41"></a>
+	<a href="https://github.com/tkorays/pycoffee/issues">
+		<img alt="Issues" src="https://img.shields.io/github/issues/tkorays/pycoffee?style=for-the-badge&logo=bilibili&color=F06060&logoColor=D9E0EE&labelColor=302D41"></a>
+	<a href="https://github.com/tkorays/pycoffee">
+		<img alt="Size" src="https://img.shields.io/github/repo-size/tkorays/pycoffee?color=8CBEB2&label=SIZE&logo=codesandbox&style=for-the-badge&logoColor=D9E0EE&labelColor=302D41"/></a>
+</p>
 &nbsp;
 
 
