@@ -36,8 +36,11 @@ def coffee_play():
 @click.option('--influxdb_password', type=str, default='', required=False, help='password of InfluxDB')
 @click.option('--influxdb_database', type=str, default='', required=False, help='InfluxDB database name')
 @click.option('--local_user', type=str, default='', required=False, help='user name')
+@click.option('--grafana_url', type=str, default='', required=False, help='grafana url')
+@click.option('--grafana_key', type=str, default='', required=False, help='grafana api key')
+@click.option('--grafana_influxdb_source', type=str, default='', required=False, help='grafana influxdb source name')
 def coffee_config(influxdb_host, influxdb_port, influxdb_username, influxdb_password, influxdb_database,
-                  local_user):
+                  local_user, grafana_url, grafana_key, grafana_influxdb_source):
     cfg_modified = False
     if influxdb_host:
         DEF_CFG.influxdb_host = influxdb_host
@@ -56,6 +59,15 @@ def coffee_config(influxdb_host, influxdb_port, influxdb_username, influxdb_pass
         cfg_modified = True
     if local_user:
         DEF_CFG.local_name = local_user
+        cfg_modified = True
+    if grafana_url:
+        DEF_CFG.grafana_url = grafana_url
+        cfg_modified = True
+    if grafana_key:
+        DEF_CFG.grafana_key = grafana_key
+        cfg_modified = True
+    if grafana_influxdb_source:
+        DEF_CFG.grafana_influxdb_source = grafana_influxdb_source
         cfg_modified = True
 
     if cfg_modified:
