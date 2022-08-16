@@ -19,7 +19,7 @@ CWD = os.path.split(os.path.realpath(__file__))[0]
 
 
 @click.group(help="Coffee - coffee time!")
-@click.version_option()
+@click.version_option(package_name='pycoffee')
 def coffee():
     pass
 
