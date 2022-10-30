@@ -111,3 +111,4 @@ class LogFileDataLoader(DataLoader):
         for s in self.sinks:
             dp = s.finish(dp)
         return dp
+

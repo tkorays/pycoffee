@@ -16,7 +16,8 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'cof=Coffee.CLI.coffee:coffee'
+            'cof=Coffee.CLI.coffee:coffee',
+            'cofd=Coffee.CLI.coffeed:coffeed'
         ]
     },
     install_requires=[
@@ -30,7 +31,12 @@ setup(
         'ntplib',
         'pyqt5',
         'grafanalib',
-        'flask'
+        'flask',
+        'pid',
+        'python-daemon',
+        'django',
+        'celery',
+        'redis'
     ],
     dependency_links=[
     ],

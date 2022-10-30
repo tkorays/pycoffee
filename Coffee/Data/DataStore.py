@@ -4,6 +4,17 @@
 import abc
 import os
 import pickle
+from Coffee.Core.Settings import DEF_CFG
+
+
+class DataStorable(metaclass=abc.ABCMeta):
+    @abc.abstractmethod
+    def store_id(self) -> str:
+        pass
+
+    @abc.abstractmethod
+    def store_type(self) -> str:
+        pass
 
 
 class DataStore(metaclass=abc.ABCMeta):
@@ -34,6 +45,18 @@ class DataStore(metaclass=abc.ABCMeta):
     def update(self, type_id: str, cache_id: str, data):
         """
         update data.
+
+        :param type_id: the data type id, the same type data has the same structure.
+        :param cache_id: data id identified by some fields.
+        :param data: data.
+        :return True if the data has been updated.
+        """
+        pass
+
+    @abc.abstractmethod
+    def update_or_add(self, type_id: str, cache_id: str, data):
+        """
+        update if exist or add new data.
 
         :param type_id: the data type id, the same type data has the same structure.
         :param cache_id: data id identified by some fields.
@@ -94,6 +117,12 @@ class FileSystemDataStore(DataStore):
             pickle.dump(data, f)
         return True
 
+    def update_or_add(self, type_id: str, cache_id: str, data):
+        if self.exist(type_id, cache_id):
+            return self.update(type_id, cache_id, data)
+        else:
+            return self.add(type_id, cache_id, data)
+
     def fetch(self, type_id: str, cache_id: str):
         if not os.path.exists(os.path.join(self.path, type_id, cache_id)):
             return None
@@ -102,3 +131,6 @@ class FileSystemDataStore(DataStore):
         with open(os.path.join(self.path, type_id, cache_id), 'rb') as f:
             data = pickle.load(f)
         return data
+
+
+DEF_DATA_STORE = FileSystemDataStore(DEF_CFG.data_store_path)

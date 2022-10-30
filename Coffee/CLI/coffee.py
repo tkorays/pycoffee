@@ -144,10 +144,18 @@ if not os.path.exists(DEF_CFG.storage_path):
     os.mkdir(DEF_CFG.storage_path)
 if not os.path.exists(DEF_CFG.plays_path):
     os.mkdir(DEF_CFG.plays_path)
+if not os.path.exists(DEF_CFG.data_store_path):
+    os.mkdir(DEF_CFG.data_store_path)
 
+# load internal playbooks
 PlaybookCommandLoader(coffee).load_multi([
     'Coffee.Playbook.PowerToys'
 ])
+# load local playbooks for debug
+PlaybookCommandLoader(coffee_play).load_custom_plays(
+    os.path.join(CWD, '../../CoffeePlaybooks')
+)
+# load custom playbooks
 PlaybookCommandLoader(coffee_play).load_custom_plays(DEF_CFG.plays_path)
 
 

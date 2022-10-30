@@ -9,3 +9,9 @@ ntplib
 pyqt5
 grafanalib
 flask
+pid
+python-daemon
+django
+celery
+django-rest-framework
+redis

@@ -120,6 +120,7 @@ class CoffeeSettings:
     local_user = ''
     storage_path = os.path.join(os.path.expanduser('~'), '.coffee')
     plays_path = os.path.join(os.path.expanduser('~'), '.coffee', 'CustomPlays')
+    data_store_path = os.path.join(os.path.expanduser('~'), '.loga', 'datastore')
 
 
 DEF_CFG = CoffeeSettings().load(os.path.join(os.path.expanduser('~'), 'coffee.ini'))

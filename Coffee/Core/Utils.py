@@ -1,11 +1,12 @@
 # Copyright 2022 tkorays. All Rights Reserved.
 # Licensed to MIT under a Contributor Agreement.
-
+import os
 from datetime import datetime
 import getpass
 from Coffee.Core.Settings import DEF_CFG
 import click
 import random
+import platform
 
 
 def merge_datetime(base_dt, diff_kv):
@@ -68,3 +69,13 @@ def web_page_compare(title, url_a, url_b):
     """
 
     app.run(host='127.0.0.1', port=random.randint(5000, 65535), debug=False)
+
+
+def show_system_popup_win(title, content):
+    if platform.system() == 'Darwin':
+        os.system(f"""osascript -e 'display notification "{content}" with title "{title}"'""")
+    elif platform.system() == 'Windows':
+        pass
+    else:
+        pass
+

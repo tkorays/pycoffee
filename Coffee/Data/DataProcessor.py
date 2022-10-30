@@ -108,3 +108,22 @@ class DatapointTimeTracker(DataSink):
         # reserve 60s offset for better display
         return datetime.fromtimestamp(self.max_ts / 1000) + timedelta(seconds=60)
 
+
+class DataAggregator(DataSink):
+    """
+    aggregate all points in an object, don't process one by one
+    """
+
+    def __init__(self):
+        super(DataAggregator, self).__init__()
+        self.all_points = []
+
+    def on_data(self, datapoint: DataPoint) -> DataPoint:
+        self.all_points.append(datapoint.value)
+        return datapoint
+
+    def finish(self, datapoint: DataPoint) -> DataPoint:
+        return datapoint
+
+    def points(self):
+        return self.all_points

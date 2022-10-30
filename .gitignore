@@ -7,3 +7,4 @@ venv/
 .python-version
 *.pyc
 *.sqlite3
+CoffeePlaybooks/*
