@@ -1,19 +1,18 @@
 # Copyright 2022 tkorays. All Rights Reserved.
 # Licensed to MIT under a Contributor Agreement.
 
-from PyQt5.QtGui import *
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import QWidget, QApplication, QGridLayout, QMessageBox, QLCDNumber
+# from PyQt5.QtGui import *
+# from PyQt5.QtCore import *
+# from PyQt5.QtWidgets import QWidget, QApplication, QGridLayout, QMessageBox, QLCDNumber
+# from Coffee.Core.NtpSync import NtpSync
 import click
-import sys
 import os
 import io
 from datetime import timedelta, datetime
 
-from Coffee.Core.NtpSync import NtpSync
 from Coffee.Core.Utils import web_page_compare
 
-
+'''
 @click.command("nbclock", help="[in] net based clock")
 @click.option("--delay", '-d', required=False, default=0, help="render delay(ms)")
 def play_nbclock(delay):
@@ -89,6 +88,7 @@ def play_nbclock(delay):
     if not clock.ready:
         return
     app.exec_()
+'''
 
 
 @click.command("split", help="[in] split log to small parts")
@@ -159,4 +159,4 @@ def play_webpage_compare(a: str, b: str):
     web_page_compare('compare web', a, b)
 
 
-commands = [play_nbclock, play_file_split, play_pcap, play_webpage_compare]
+commands = [play_file_split, play_pcap, play_webpage_compare]

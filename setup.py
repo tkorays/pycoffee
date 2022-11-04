@@ -29,7 +29,6 @@ setup(
         'watchdog',
         'rich',
         'ntplib',
-        'pyqt5',
         'grafanalib',
         'flask',
         'pid',
