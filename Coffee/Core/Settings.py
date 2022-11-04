@@ -1,127 +1,46 @@
 # Copyright 2022 tkorays. All Rights Reserved.
 # Licensed to MIT under a Contributor Agreement.
 
-import configparser
 import os
 import yaml
+from dataclasses import dataclass
+try:
+    from yaml import CLoader as Loader, CDumper as Dumper
+except ImportError:
+    from yaml import Loader, Dumper
 
 
-def as_yaml(a_class):
-    class Wrapper:
-        def __init__(self, *args, **kwargs):
-            self.__dict__['wrapped'] = a_class(*args, **kwargs)
-            super(a_class, self.wrapped).__init__()
-            self.wrapped.__dict__['__full_path__'] = ''
-            self.__ini_vars__ = []
-            for v in [v for v in a_class.__dict__ if not v.startswith('__') and not v.endswith('__')]:
-                self.__ini_vars__.append(v)
-                self.wrapped.__dict__[v] = a_class.__dict__[v]
-
-        def __getattr__(self, item):
-            return getattr(self.wrapped, item)
-
-        def __setattr__(self, key, value):
-            setattr(self.wrapped, key, value)
-
-        def load(self, path):
-            self.wrapped.__dict__['__full_path__'] = path
-            if not os.path.exists(path):
-                self.save(path)
-
-            cfg = yaml.load(open(path, 'r'), yaml.Loader)
-
-            for v in self.__ini_vars__:
-                self.wrapped.__dict__[v] = type(a_class.__dict__[v])(cfg.get(v, a_class.__dict__[v]))
-            return self
-
-        def save(self, path=''):
-            if not path and self.wrapped.__dict__['__full_path__']:
-                path = self.wrapped.__dict__['__full_path__']
-
-            obj = {}
-            for v in self.__ini_vars__:
-                obj[v] = self.wrapped.__dict__[v]
-            yaml.dump(obj, open(path, 'w'))
-
-        def __str__(self):
-            s = ''
-            for v in self.__ini_vars__:
-                s += f'{v}:{self.wrapped.__dict__[v]},'
-            return s
-
-        def __repr__(self):
-            return self.__str__()
-
-    return Wrapper
+DEF_SETTING_PATH = os.path.join(os.path.expanduser('~'), 'coffee.yaml')
 
 
-def as_ini(a_class):
-    class Wrapper:
-        def __init__(self, *args, **kwargs):
-            self.__dict__['wrapped'] = a_class(*args, **kwargs)
-            super(a_class, self.wrapped).__init__()
-            self.wrapped.__dict__['__full_path__'] = ''
-            self.__ini_vars__ = []
-            for v in [v for v in a_class.__dict__ if not v.startswith('__') and not v.endswith('__')]:
-                self.__ini_vars__.append(v)
-                self.wrapped.__dict__[v] = a_class.__dict__[v]
+@dataclass
+class Setting(yaml.YAMLObject):
+    version: str = '1.0'
+    influxdb_host: str = '127.0.0.1'
+    influxdb_port: int = 8086
+    influxdb_username: str = ''
+    influxdb_password: str = ''
+    influxdb_database: str = 'coffee'
+    grafana_url: str = '127.0.0.1:3000'
+    grafana_key: str = ''
+    grafana_influxdb_source: str = 'InfluxDB'
+    local_user: str = ''
+    storage_path: str = os.path.join(os.path.expanduser('~'), '.coffee')
+    plays_path: str = os.path.join(os.path.expanduser('~'), '.coffee', 'CustomPlays')
+    data_store_path: str = os.path.join(os.path.expanduser('~'), '.coffee', 'datastore')
 
-        def __getattr__(self, item):
-            return getattr(self.wrapped, item)
+    @staticmethod
+    def load(path: str):
+        with open(path, 'r') as f:
+            return yaml.load(f, Loader=Loader)
 
-        def __setattr__(self, key, value):
-            setattr(self.wrapped, key, value)
+    def save(self, path: str = ''):
+        path = DEF_SETTING_PATH if not path else path
+        with open(path, 'w') as f:
+            yaml.dump(self, stream=f, Dumper=Dumper)
 
-        def load(self, path):
-            self.wrapped.__dict__['__full_path__'] = path
-            if not os.path.exists(path):
-                self.save(path)
-            cfg = configparser.ConfigParser()
-            cfg.read(path)
-            for v in self.__ini_vars__:
-                self.wrapped.__dict__[v] = type(a_class.__dict__[v])(cfg.get('main', v, fallback=a_class.__dict__[v]))
-            return self
-
-        def save(self, path=''):
-            if not path and self.wrapped.__dict__['__full_path__']:
-                path = self.wrapped.__dict__['__full_path__']
-            cfg = configparser.ConfigParser()
-            cfg.add_section('main')
-            for v in self.__ini_vars__:
-                cfg.set('main', v, str(self.wrapped.__dict__[v]))
-            cfg.write(open(path, 'w'))
-
-        def __str__(self):
-            s = ''
-            for v in self.__ini_vars__:
-                s += f'{v}:{self.wrapped.__dict__[v]},'
-            return s
-
-        def __repr__(self):
-            return self.__str__()
-
-        def wrapped(self):
-            return self.wrapped
-    return Wrapper
+    def set(self, key: str, value: object):
+        self.__setattr__(key, value)
 
 
-@as_ini
-#@as_yaml
-class CoffeeSettings:
-    version = '1.0'
-    influxdb_host = '127.0.0.1'
-    influxdb_port = 8086
-    influxdb_username = ''
-    influxdb_password = ''
-    influxdb_database = 'coffee'
-    grafana_url = '127.0.0.1:3000'
-    grafana_key = ''
-    grafana_influxdb_source = 'InfluxDB'
-    local_user = ''
-    storage_path = os.path.join(os.path.expanduser('~'), '.coffee')
-    plays_path = os.path.join(os.path.expanduser('~'), '.coffee', 'CustomPlays')
-    data_store_path = os.path.join(os.path.expanduser('~'), '.loga', 'datastore')
-
-
-DEF_CFG = CoffeeSettings().load(os.path.join(os.path.expanduser('~'), 'coffee.ini'))
-#DEF_CFG = CoffeeSettings().load(os.path.join(os.path.expanduser('~'), 'coffee.yaml'))
+DEF_CFG = Setting.load(DEF_SETTING_PATH)

@@ -30,48 +30,11 @@ def coffee_play():
 
 
 @click.command("config", help="[in] config the coffee")
-@click.option('--influxdb_host', type=str, default='', required=False, help="InfluxDB service host")
-@click.option('--influxdb_port', type=str, default='', required=False, help="InfluxDB service port")
-@click.option('--influxdb_username', type=str, default='', required=False, help='username of InfluxDB')
-@click.option('--influxdb_password', type=str, default='', required=False, help='password of InfluxDB')
-@click.option('--influxdb_database', type=str, default='', required=False, help='InfluxDB database name')
-@click.option('--local_user', type=str, default='', required=False, help='user name')
-@click.option('--grafana_url', type=str, default='', required=False, help='grafana url')
-@click.option('--grafana_key', type=str, default='', required=False, help='grafana api key')
-@click.option('--grafana_influxdb_source', type=str, default='', required=False, help='grafana influxdb source name')
-def coffee_config(influxdb_host, influxdb_port, influxdb_username, influxdb_password, influxdb_database,
-                  local_user, grafana_url, grafana_key, grafana_influxdb_source):
-    cfg_modified = False
-    if influxdb_host:
-        DEF_CFG.influxdb_host = influxdb_host
-        cfg_modified = True
-    if influxdb_port:
-        DEF_CFG.influxdb_port = influxdb_port
-        cfg_modified = True
-    if influxdb_username:
-        DEF_CFG.influxdb_username = influxdb_username
-        cfg_modified = True
-    if influxdb_password:
-        DEF_CFG.influxdb_password = influxdb_password
-        cfg_modified = True
-    if influxdb_database:
-        DEF_CFG.influxdb_database = influxdb_database
-        cfg_modified = True
-    if local_user:
-        DEF_CFG.local_name = local_user
-        cfg_modified = True
-    if grafana_url:
-        DEF_CFG.grafana_url = grafana_url
-        cfg_modified = True
-    if grafana_key:
-        DEF_CFG.grafana_key = grafana_key
-        cfg_modified = True
-    if grafana_influxdb_source:
-        DEF_CFG.grafana_influxdb_source = grafana_influxdb_source
-        cfg_modified = True
-
-    if cfg_modified:
-        DEF_CFG.save()
+@click.option('-k', '--key', type=str, required=True, help='config key')
+@click.option('-v', '--value', required=True, help='config value')
+def coffee_config(key, value):
+    DEF_CFG.set(key, value)
+    DEF_CFG.save()
 
 
 @click.command('play-add', help='[in] add custom play')
