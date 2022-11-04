@@ -2,14 +2,8 @@
 # Licensed to MIT under a Contributor Agreement.
 
 from Coffee.Core.Playbook import Playbook
-from Coffee.Data.TimestampPatterns import DEFAULT_TS_PATTERNS
-from Coffee.Data.DataPattern import PatternGroupBuilder, RegexPattern
-from Coffee.Data.DataViz import GrafanaDashboardBuilder, InfluxdbQueryBuilder
 from Coffee.Core.Settings import DEF_CFG
-from Coffee.Data.DataLoader import LogFileDataLoader
-from Coffee.Data.Database import DEF_TSDB
-from Coffee.Data.DataProcessor import InfluxDBDataSink, DatapointTimeTracker 
-from Coffee.Data.PatternMatchReport import PatternMatchReporter
+from Coffee.Data import *
 import webbrowser
 
 

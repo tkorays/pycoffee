@@ -55,6 +55,10 @@ class InfluxdbQueryBuilder:
         query += f') AND $timeFilter'
         return query
 
+    @staticmethod
+    def build_sql(sql):
+        return sql
+
 
 class GrafanaDashboardBuilder:
     """
