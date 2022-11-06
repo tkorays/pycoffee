@@ -114,12 +114,15 @@ class DataAggregator(DataSink):
     aggregate all points in an object, don't process one by one
     """
 
-    def __init__(self):
+    def __init__(self, append_timestamp: bool = False):
         super(DataAggregator, self).__init__()
         self.all_points = []
+        self.append_timestamp = append_timestamp
 
     def on_data(self, datapoint: DataPoint) -> DataPoint:
-        self.all_points.append(datapoint.value)
+        value = datapoint.value
+        value['timestamp'] = datapoint.timestamp
+        self.all_points.append(value)
         return datapoint
 
     def finish(self, datapoint: DataPoint) -> DataPoint:

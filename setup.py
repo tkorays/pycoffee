@@ -1,5 +1,5 @@
 from setuptools import setup, find_packages
-version = '1.0.3'
+version = '1.0.5'
 
 
 setup(
@@ -36,8 +36,8 @@ setup(
         'django',
         'celery',
         'redis',
-        'pandas',
-        'matplotlib'
+        # 'pandas',
+        # 'matplotlib'
     ],
     dependency_links=[
     ],

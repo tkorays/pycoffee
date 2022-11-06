@@ -68,6 +68,8 @@ class LogFileDataLoader(DataLoader, PatternGroupBuilder):
         except ValueError:
             base_datetime = datetime.utcnow()
 
+        prev_datetime = None
+
         # get lines of this log
         lines = 0
         for _, _ in enumerate(io.open(self.log_path, encoding='utf-8', errors='ignore')):
@@ -85,25 +87,27 @@ class LogFileDataLoader(DataLoader, PatternGroupBuilder):
                 if not line:
                     break
 
+                # match time
+                ts = None
+                for t in PTS:
+                    ts = t.match(line)
+                    # early break when find ts
+                    if ts:
+                        break
+
+                if not ts:
+                    if not prev_datetime:
+                        continue
+                    dt = prev_datetime
+                else:
+                    dt = merge_datetime(base_datetime, ts)
+                    prev_datetime = dt
+
                 for p in PDT:
                     # match data
                     r = p.match(line)
                     if not r:
                         continue
-
-                    # match time
-                    ts = None
-                    for t in PTS:
-                        ts = t.match(line)
-                        # early break when find ts
-                        if ts:
-                            break
-
-                    if not ts:
-                        # not find ts
-                        continue
-
-                    dt = merge_datetime(base_datetime, ts)
 
                     dp = DataPoint(
                             name=p.get_name(),
