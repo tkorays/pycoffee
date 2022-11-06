@@ -35,7 +35,9 @@ setup(
         'python-daemon',
         'django',
         'celery',
-        'redis'
+        'redis',
+        'pandas',
+        'matplotlib'
     ],
     dependency_links=[
     ],

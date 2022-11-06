@@ -5,14 +5,13 @@
 道生一，一生二，二生三，三生万物。
 万物负阴而抱阳，冲气以为和。
 """
-
-
+from abc import ABC
 from datetime import datetime
 from rich.console import Console
 from rich.progress import Progress
 import io
 
-from Coffee.Data.DataPattern import RegexPattern
+from Coffee.Data.DataPattern import RegexPattern, PatternGroupBuilder
 from Coffee.Core.Utils import merge_datetime
 from Coffee.Data.DataPattern import PatternGroup
 from Coffee.Data.DataProcessor import DataSink
@@ -20,9 +19,9 @@ from Coffee.Data.DataProcessor import DataSource
 from Coffee.Data.DataPoint import DataPoint
 
 
-class DataLoader(DataSource):
+class DataLoader(DataSource, DataSink, ABC):
     """
-    Load data from some source.
+    Load data from some source, and feed datapoints to all sinks.
     """
     def __init__(self):
         self.sinks = []
@@ -34,19 +33,32 @@ class DataLoader(DataSource):
     def start(self):
         pass
 
+    def on_data(self, datapoint: DataPoint) -> DataPoint:
+        for s in self.sinks:
+            datapoint = s.on_data(datapoint)
+        return datapoint
 
-class LogFileDataLoader(DataLoader):
-    def __init__(self, log_path: str, pattern_preset: PatternGroup):
-        super().__init__()
+    def finish(self, datapoint: DataPoint) -> DataPoint:
+        for s in self.sinks:
+            datapoint = s.finish(datapoint)
+        return datapoint
 
+
+class LogFileDataLoader(DataLoader, PatternGroupBuilder):
+    def __init__(self, log_path: str):
+        DataLoader.__init__(self)
+        PatternGroupBuilder.__init__(self)
         self.log_path = log_path
-        self.pattern_preset = pattern_preset
+
+    def set_pattern_group(self, group: PatternGroup):
+        self.pattern_group = group
+        return self
 
     def start(self):
         # timestamp pattern in logs
-        PTS = self.pattern_preset.get_ts_patterns()
+        PTS = self.pattern_group.get_ts_patterns()
         # data pattern in logs
-        PDT = self.pattern_preset.get_patterns()
+        PDT = self.pattern_group.get_patterns()
 
         # try to get date in log path
         # some logs don't have year/moth/day info
@@ -104,11 +116,8 @@ class LogFileDataLoader(DataLoader):
                                 'tags': p.get_tags(),
                             }
                         )
-                    for s in self.sinks:
-                        dp = s.on_data(dp)
+                    dp = self.on_data(dp)
 
         dp = DataPoint.make_meta_datapoint({})
-        for s in self.sinks:
-            dp = s.finish(dp)
+        dp = self.finish(dp)
         return dp
-

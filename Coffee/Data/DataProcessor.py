@@ -29,7 +29,7 @@ class DataSink(metaclass=abc.ABCMeta):
         pass
 
 
-class DummySink(DataSink):
+class BypassDataSink(DataSink):
     def on_data(self, datapoint: DataPoint) -> DataPoint:
         return datapoint
 

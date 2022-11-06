@@ -14,3 +14,5 @@ django
 celery
 django-rest-framework
 redis
+pandas
+matplotlib

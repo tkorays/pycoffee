@@ -77,7 +77,7 @@ class SimplePlaybook(Playbook):
         2022-08-13 12:00:04.000 1234,6
         2022-08-13 12:00:08.000 1234,0
         """
-        LogFileDataLoader(self.log, self.pattern_group).add_sink(
+        LogFileDataLoader(self.log).set_pattern_group(self.pattern_group).add_sink(
             # upload data to influxdb
             InfluxDBDataSink(DEF_TSDB)
         ).add_sink(

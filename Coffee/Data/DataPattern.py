@@ -148,25 +148,25 @@ class PatternGroupBuilder:
     """
     build a pattern group
     """
-    def __init__(self, name: str):
-        self.group = PatternGroup(name, [], [])
+    def __init__(self, name: str = ''):
+        self.pattern_group = PatternGroup(name, [], [])
 
-    def set_ts_patterns(self, ts):
-        self.group.ts_patterns = ts
+    def set_ts_patterns(self, ts: list):
+        self.pattern_group.ts_patterns = ts
         return self
     
-    def set_patterns(self, p):
-        self.group.patterns = p
+    def set_patterns(self, p: list):
+        self.pattern_group.patterns = p
         return self
 
-    def add_ts_pattern(self, ts):
-        self.group.ts_patterns.append(ts)
+    def add_ts_pattern(self, ts: RegexPattern):
+        self.pattern_group.ts_patterns.append(ts)
         return self
 
-    def add_pattern(self, p):
-        self.group.patterns.append(p)
+    def add_pattern(self, p: RegexPattern):
+        self.pattern_group.patterns.append(p)
         return self
 
     def build(self):
-        return self.group
+        return self.pattern_group
 
