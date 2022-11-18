@@ -14,7 +14,7 @@ class DataAggregator1(DataAggregator):
 agg = DataAggregator1()
 
 
-LogFileDataLoader("1.log").set_ts_patterns(
+LogFileDataLoader("simple.log").set_ts_patterns(
     DEFAULT_TS_PATTERNS
 ).add_pattern(
     RegexPattern(name="a_pattern",

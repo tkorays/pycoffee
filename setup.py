@@ -34,8 +34,9 @@ setup(
         'pid',
         'python-daemon',
         'django',
-        'celery',
-        'redis',
+        # 'celery',
+        # 'redis',
+        'h5py',
         # 'pandas',
         # 'matplotlib'
     ],

@@ -20,7 +20,7 @@ from .DataStore import (
     DataStorable, DataStore, FileSystemDataStore, DEF_DATA_STORE
 )
 from .DataViz import (
-    InfluxdbQueryBuilder, GrafanaDashboardBuilder
+    GrafanaDashboardBuilder, influxdb_ts_sql
 )
 from .PatternMatchReport import PatternMatchReporter
 from .TimestampPatterns import DEFAULT_TS_PATTERNS

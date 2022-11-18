@@ -8,20 +8,6 @@ import webbrowser
 
 
 class SimplePlaybook(Playbook):
-    """
-    usage:
-
-        ```python
-        SimplePlaybook("1.log").prepare().play()
-        ```
-
-    then coffee will:
-    * auto generate a dashboard for displaying data
-    * extract data from log
-    * upload data to influxdb
-    * print match result in the console
-    * open grafana webpage to show timeseries data
-    """
     def __init__(self, log: str = ''):
         self.log = log
 
@@ -32,7 +18,7 @@ class SimplePlaybook(Playbook):
             DEFAULT_TS_PATTERNS
         ).add_pattern(
             RegexPattern(
-                name="a_pattern",
+                name="b_pattern",
                 pattern=r'(\d+),(\d+)',
                 fields={
                     'a': int,
@@ -50,13 +36,13 @@ class SimplePlaybook(Playbook):
             description='description of this dashboard',
             tags=['example']
         ).add_text_variable(
-            name='A', label='A filter'
+            name="filter_a", label='A filter'
         ).add_influx_ts_panel(
             title='show data b',
             source=DEF_CFG.grafana_influxdb_source,
             influx_query_list=[
                 # just show b and filter with A
-                InfluxdbQueryBuilder('a_pattern').query_list(['b']).build(tags=['A'])
+                influxdb_ts_sql(''' select first("b") as "B" from b_pattern where ("A" =~ /^$filter_a$/) ''')
             ]
         ).build()
 
@@ -71,12 +57,6 @@ class SimplePlaybook(Playbook):
     def play(self):
         # extract data from log, the log should have the format:
         # datetime-pattern data_a, data_b, for example
-        """
-        2022-08-13 12:00:00.000 1234,1
-        2022-08-13 12:00:02.000 1234,3
-        2022-08-13 12:00:04.000 1234,6
-        2022-08-13 12:00:08.000 1234,0
-        """
         LogFileDataLoader(self.log).set_pattern_group(self.pattern_group).add_sink(
             # upload data to influxdb
             InfluxDBDataSink(DEF_TSDB)
@@ -96,14 +76,8 @@ class SimplePlaybook(Playbook):
                                                 dt_from=self.time_tracker.min_ts,
                                                 dt_to=self.time_tracker.max_ts)
                         )
-        # then this page is open
-        # http://127.0.0.1:3000/d/a_dashboard/a_dashboard?orgId=1&from=1660276800000&to=1660276808000
-        # but now data will be displayed because the tag 'A' is not provided
-        # when you fill the A filter with `1234`
-        # you will see the data
-        # http://127.0.0.1:3000/d/a_dashboard/a_dashboard?orgId=1&from=1660276800000&to=1660276808000&var-A=1234
-        
+
 
 if __name__ == '__main__':
-    SimplePlaybook('1.log').prepare().play()
+    SimplePlaybook('simple.log').prepare().play()
 

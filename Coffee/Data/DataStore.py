@@ -4,6 +4,7 @@
 import abc
 import os
 import pickle
+import h5py
 from Coffee.Core.Settings import DEF_CFG
 
 
@@ -86,7 +87,7 @@ class FileSystemDataStore(DataStore):
         if not os.path.exists(self.path):
             os.mkdir(self.path)
         if not os.path.exists(self.path):
-            raise Exception
+            raise Exception("failed to crate storage.")
 
     def exist(self, type_id: str, cache_id: str):
         if os.path.exists(os.path.join(self.path, type_id, cache_id)):
@@ -131,6 +132,59 @@ class FileSystemDataStore(DataStore):
         with open(os.path.join(self.path, type_id, cache_id), 'rb') as f:
             data = pickle.load(f)
         return data
+
+
+class HDF5DataStore(DataStore):
+    def __init__(self, path):
+        self.path = path
+        self.hdf5 = h5py.File(self.path, "a")
+        # root has a data set named type_id
+
+    def __del__(self):
+        self.hdf5.close()
+
+    def exist(self, type_id: str, cache_id: str):
+        dataset = self.hdf5.get(f"{type_id}")
+        if not dataset:
+            return False
+        return cache_id in dataset.keys()
+
+    def add(self, type_id: str, cache_id: str, data):
+        dataset = self.hdf5.get(f"{type_id}")
+        if not dataset:
+            self.hdf5.create_dataset(f'{type_id}', data='')
+            dataset = self.hdf5.get(f"{type_id}")
+        else:
+            if cache_id not in dataset.attrs.keys():
+                return True
+        dataset.attrs[cache_id] = pickle.dumps(data).hex()
+        self.hdf5.update()
+        return True
+
+    def update(self, type_id: str, cache_id: str, data):
+        dataset = self.hdf5.get(f"{type_id}")
+        if dataset:
+            dataset.attrs[cache_id] = pickle.dumps(data).hex()
+            self.hdf5.update()
+        return True
+
+    def update_or_add(self, type_id: str, cache_id: str, data):
+        dataset = self.hdf5.get(f"{type_id}")
+        if not dataset:
+            self.hdf5.create_dataset(f'{type_id}', data='')
+            dataset = self.hdf5.get(f"{type_id}")
+
+        dataset.attrs[cache_id] = pickle.dumps(data).hex()
+        self.hdf5.update()
+        return True
+
+    def fetch(self, type_id: str, cache_id: str):
+        dataset = self.hdf5.get(f"{type_id}")
+        if not dataset:
+            return None
+        if cache_id not in dataset.attrs.keys():
+            return None
+        return pickle.loads(bytes.fromhex(dataset.attrs[cache_id]))
 
 
 DEF_DATA_STORE = FileSystemDataStore(DEF_CFG.data_store_path)

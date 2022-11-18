@@ -8,56 +8,16 @@ import json
 import requests
 
 
-class InfluxdbQueryBuilder:
-    def __init__(self, measurement):
-        self.fields = []
-        self.measurement = measurement
+def influxdb_ts_sql(sql, interval: str = '1s', fill: str = 'none'):
+    """
+    query timeseries data with influx SQL.
 
-    def query(self, name, alias='',
-              selector='first' in ['first', 'last', 'min', 'max'],
-              processor='' in ['', 'difference']):
-        alias = alias if alias else name
-        if not processor:
-            self.fields.append(f'{selector}("{name}") AS "{alias}"')
-        else:
-            self.fields.append(f'{processor}({selector}("{name}")) AS "{alias}"')
-        return self
+    demo:
+    select first("a") as "alia_A", first("b") from "measurement_123" where ("tagA" =~ /$grafana_value$/ and "tagB" = 1)
 
-    def query_list(self, li: list):
-        for item in li:
-            if isinstance(item, str):
-                self.fields.append(f'first("{item}") AS "{item}"')
-            else:
-                proc = '' if len(item) < 4 else item[3]
-                sel = 'first' if len(item) < 3 else item[2]
-                alias = item[0] if len(item) < 2 else item[1]
-                self.query(item[0], alias, sel, proc)
-        return self
-
-    def query_list_raw(self, li: list):
-        for item in li:
-            self.fields.append(f'"{item}"')
-        return self
-
-    def build(self, tags: list, filters: dict = {}, interval='1s', fill='none'):
-        query = 'SELECT ' + ' ,'.join(self.fields) + f' from "{self.measurement}" WHERE ('
-        query += ' AND '.join([f'"{k}"=~/^${k}$/' for k in tags])
-        query += ' AND '.join([f'"{k}"="{v}"' for k, v in filters.items()])
-        query += f') AND $timeFilter GROUP BY time({interval}) fill({fill})'
-        return query
-
-    def build_nots(self, tags: list, filters: dict = {}):
-        query = 'SELECT ' + ' ,'.join(self.fields) + f' from "{self.measurement}" WHERE ('
-        query += ' AND '.join([f'"{k}"=~/^${k}$/' for k in tags])
-        if filters:
-            query += ' AND '
-            query += ' AND '.join([f'"{k}"=\'{v}\'' for k, v in filters.items()])
-        query += f') AND $timeFilter'
-        return query
-
-    @staticmethod
-    def build_sql(sql):
-        return sql
+    we will add `time filter` and `group by`. If you want to query non ts data, just use raw SQL.
+    """
+    return f'{sql} AND $timeFilter GROUP BY time({interval}) fill({fill})'
 
 
 class GrafanaDashboardBuilder:
@@ -98,26 +58,27 @@ class GrafanaDashboardBuilder:
         ))
         return self
 
-    def add_row_panel(self, title: str):
-        self.panels.append(RowPanel(title=title, gridPos=GridPos(h=1, w=24, x=self.cur_x, y=self.cur_y)))
+    def add_row_panel(self, title: str, collapsed=False):
+        self.panels.append(RowPanel(title=title, collapsed=collapsed,
+                                    gridPos=GridPos(h=1, w=24, x=self.cur_x, y=self.cur_y)))
         self.cur_x = 0
         self.cur_y += 1
         return self
 
-    def add_influx_ts_panel(self, title: str, source: str, influx_query_list: list):
+    def add_influx_ts_panel(self, title: str, source: str, influx_query_list: list, height=8):
         self.panels.append(TimeSeries(
             title=title,
             dataSource=source,
             targets=[
                 InfluxDBTarget(query=x, format='time_series') for x in influx_query_list
             ],
-            interval='500ms',
             showPoints='always',
+            interval='1ms',
             tooltipMode='multi',
-            gridPos=GridPos(h=8, w=24, x=self.cur_x, y=self.cur_y)
+            gridPos=GridPos(h=height, w=24, x=self.cur_x, y=self.cur_y)
         ))
         self.cur_x = 0
-        self.cur_y += 8
+        self.cur_y += height
         return self
 
     def add_influx_table_panel(self, title: str, source: str, influx_query_list, overrides=[]):
