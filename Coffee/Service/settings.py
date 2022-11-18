@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-zaq=0viwo9s_lt@jd8%zt)n$l1=&lv)ng)v(px^6ti89d1hyw9
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 
 # ServiceApp definition

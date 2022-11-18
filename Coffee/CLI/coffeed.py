@@ -22,14 +22,10 @@ def coffee_daemon():
         print(f'coffee daemon started with pid file: {PID_NAME}')
         os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Coffee.Service.settings')
         try:
-            from django.core.management import execute_from_command_line
+            from django.core.management import execute_from_command_line, ManagementUtility
         except ImportError as exc:
-            raise ImportError(
-                "Couldn't import Django. Are you sure it's installed and "
-                "available on your PYTHONPATH environment variable? Did you "
-                "forget to activate a virtual environment?"
-            ) from exc
-        execute_from_command_line(['manage.py', 'runserver'])
+            raise ImportError("Couldn't import Django.") from exc
+        ManagementUtility(['coffeed', 'runserver']).execute()
 
 
 @click.group(help="cofd - coffee service!")
@@ -51,12 +47,26 @@ def coffeed_stop():
     try:
         with open(PID_NAME) as f:
             os.kill(int(f.readline()), signal.SIGKILL)
+            print('stop success!')
     except:
         print('Kill process failed! No pid or no process found!')
 
 
+@click.command('status', help='coffee service status')
+def coffeed_status():
+    try:
+        with open(PID_NAME) as f:
+            os.kill(int(f.readline()), signal.SIG_DFL)
+            print('service is running')
+    except OSError:
+        print('service is not running')
+    except:
+        print('service is running')
+
+
 coffeed.add_command(coffeed_start)
 coffeed.add_command(coffeed_stop)
+coffeed.add_command(coffeed_status)
 
 
 if __name__ == "__main__":
