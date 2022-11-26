@@ -11,7 +11,5 @@ flask
 pid
 python-daemon
 django
-# celery
-# django-rest-framework
-# redis
 h5py
+ddt

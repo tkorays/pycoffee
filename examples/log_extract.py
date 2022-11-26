@@ -2,6 +2,8 @@ from Coffee.Data import *
 import pandas as pd
 import matplotlib.pyplot as plt
 
+from Data import DataPoint
+
 
 class DataAggregator1(DataAggregator):
     def on_data(self, datapoint: DataPoint) -> DataPoint:

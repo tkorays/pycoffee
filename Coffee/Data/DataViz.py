@@ -20,6 +20,11 @@ def influxdb_ts_sql(sql, interval: str = '1s', fill: str = 'none'):
     return f'{sql} AND $timeFilter GROUP BY time({interval}) fill({fill})'
 
 
+def add_influxdb_source():
+    "http://{server_addr}/api/datasources"
+    pass
+
+
 class GrafanaDashboardBuilder:
     """
     Utils class for creating dashboard for grafana.

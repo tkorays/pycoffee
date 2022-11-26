@@ -144,6 +144,10 @@ class RegexPattern(PatternInterface, yaml.YAMLObject):
         return success_cnt == len(self.tests)
 
 
+class GrokPattern(PatternInterface):
+    pass
+
+
 class PatternGroupBuilder:
     """
     build a pattern group

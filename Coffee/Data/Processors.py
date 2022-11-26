@@ -1,32 +1,20 @@
 # Copyright 2022 tkorays. All Rights Reserved.
 # Licensed to MIT under a Contributor Agreement.
 
-import abc
+"""
+this file provides some data processors:
+* bypass processor
+* influxdb processor
+* time tracker
+* data aggregator
+"""
 
-from Coffee.Data.DataPoint import DataPoint
+from Coffee.Data.DataFlow import DataPoint
 from Coffee.Data.Database import InfluxDBV1
 from Coffee.Core.Utils import randstr
+from Coffee.Data.DataFlow import DataSink
+
 from datetime import datetime, timedelta
-
-
-class DataSink(metaclass=abc.ABCMeta):
-    @abc.abstractmethod
-    def on_data(self, datapoint: DataPoint) -> DataPoint:
-        """
-        Input source data to sink.
-
-        :param datapoint: data
-        """
-        pass
-
-    @abc.abstractmethod
-    def finish(self, datapoint: DataPoint) -> DataPoint:
-        """
-        No data anymore. This is the last call for processing data.
-
-        :param datapoint: data
-        """
-        pass
 
 
 class BypassDataSink(DataSink):
@@ -35,24 +23,6 @@ class BypassDataSink(DataSink):
 
     def finish(self, datapoint: DataPoint) -> DataPoint:
         return datapoint
-
-
-class DataSource(metaclass=abc.ABCMeta):
-    @abc.abstractmethod
-    def add_sink(self, sink: DataSink):
-        """
-        Add data consumer to the data source.
-
-        :param sink: data consumer to consume the output data.
-        """
-        pass
-
-    @abc.abstractmethod
-    def start(self):
-        """
-        Bootstrap the data generator.
-        """
-        pass
 
 
 class InfluxDBDataSink(DataSink):

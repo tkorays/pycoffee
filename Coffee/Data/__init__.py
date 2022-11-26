@@ -4,16 +4,16 @@ from .Database import (
     DEF_TSDB
 )
 from .DataLoader import (
-    DataLoader, LogFileDataLoader
+    LogFileDataLoader
 )
 from .DataModel import DataModel
 from .DataPattern import (
     PatternInterface, RegexPattern,
     PatternGroup, PatternGroupBuilder
 )
-from .DataPoint import DataPoint
-from .DataProcessor import (
-    DataSource, DataSink, DataAggregator, DatapointTimeTracker,
+from .DataFlow import DataPoint, DataSink, DataSource, DataLoader
+from .Processors import (
+    DataAggregator, DatapointTimeTracker,
     InfluxDBDataSink
 )
 from .DataStore import (

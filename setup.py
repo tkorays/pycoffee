@@ -34,11 +34,8 @@ setup(
         'pid',
         'python-daemon',
         'django',
-        # 'celery',
-        # 'redis',
         'h5py',
-        # 'pandas',
-        # 'matplotlib'
+        'ddt',
     ],
     dependency_links=[
     ],

@@ -3,8 +3,10 @@ from watchdog.events import FileSystemEventHandler
 from Coffee.Core.LogTail import LogTail
 from Coffee.Core.Utils import merge_datetime
 from Coffee.Data import (
-    DataSink, DataPoint, DataLoader, PatternGroupBuilder, PatternGroup, RegexPattern
+    PatternGroupBuilder, PatternGroup, RegexPattern
 )
+from Data import DataLoader
+from Coffee.Data.DataFlow import DataPoint, DataSink
 from datetime import datetime
 import re
 import os
@@ -119,6 +121,7 @@ class LogWatchDog(DataLoader, PatternGroupBuilder, LineSink):
     def start(self):
         self.observer.schedule(self.event_handler, self.path)
         self.observer.start()
+        print('watching...')
         try:
             while self.observer.is_alive():
                 pass

@@ -5,6 +5,7 @@ import abc
 import os
 import pickle
 import h5py
+import numpy as np
 from Coffee.Core.Settings import DEF_CFG
 
 
@@ -135,6 +136,9 @@ class FileSystemDataStore(DataStore):
 
 
 class HDF5DataStore(DataStore):
+    # how to store VLEN bytes in HDF5
+    # https://docs.h5py.org/en/latest/special.html?highlight=VLEN#h5py.vlen_dtype
+
     def __init__(self, path):
         self.path = path
         self.hdf5 = h5py.File(self.path, "a")
@@ -157,14 +161,14 @@ class HDF5DataStore(DataStore):
         else:
             if cache_id not in dataset.attrs.keys():
                 return True
-        dataset.attrs[cache_id] = pickle.dumps(data).hex()
+        dataset.attrs[cache_id] = np.void(pickle.dumps(data))
         self.hdf5.update()
         return True
 
     def update(self, type_id: str, cache_id: str, data):
         dataset = self.hdf5.get(f"{type_id}")
         if dataset:
-            dataset.attrs[cache_id] = pickle.dumps(data).hex()
+            dataset.attrs[cache_id] = np.void(pickle.dumps(data))
             self.hdf5.update()
         return True
 
@@ -174,7 +178,7 @@ class HDF5DataStore(DataStore):
             self.hdf5.create_dataset(f'{type_id}', data='')
             dataset = self.hdf5.get(f"{type_id}")
 
-        dataset.attrs[cache_id] = pickle.dumps(data).hex()
+        dataset.attrs[cache_id] = np.void(pickle.dumps(data))
         self.hdf5.update()
         return True
 
@@ -184,7 +188,7 @@ class HDF5DataStore(DataStore):
             return None
         if cache_id not in dataset.attrs.keys():
             return None
-        return pickle.loads(bytes.fromhex(dataset.attrs[cache_id]))
+        return pickle.loads(dataset.attrs[cache_id].tobytes())
 
 
 DEF_DATA_STORE = FileSystemDataStore(DEF_CFG.data_store_path)
