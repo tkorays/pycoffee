@@ -7,7 +7,7 @@ from .DataLoader import (
     LogFileDataLoader
 )
 from .DataModel import DataModel
-from .DataPattern import (
+from .DataExtractor import (
     PatternInterface, RegexPattern,
     PatternGroup, PatternGroupBuilder
 )

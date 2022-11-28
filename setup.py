@@ -35,6 +35,7 @@ setup(
         'python-daemon',
         'django',
         'h5py',
+        'numpy',
         'ddt',
     ],
     dependency_links=[

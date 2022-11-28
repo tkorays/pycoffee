@@ -148,6 +148,47 @@ class GrokPattern(PatternInterface):
     pass
 
 
+class SplitPattern(PatternInterface):
+    def __init__(self, name: str, keyword: str, splitter: str, kv_splitter: str, fields: dict, tags: dict = [], processors=[], tests=[]):
+        self.name = name
+        self.keyword = keyword
+        self.splitter = splitter
+        self.kv_splitter = kv_splitter
+        self.fields = fields
+        self.tags = tags
+        self.processors = processors
+        self.tests = tests
+        self.match_count = 0
+
+    def get_unique_id(self):
+        return self.name
+
+    def get_name(self):
+        return self.name
+
+    def get_tags(self):
+        return self.tags
+
+    def get_match_count(self):
+        return self.match_count
+
+    def match(self, s):
+        fields = s.split(self.splitter)
+        if self.keyword not in fields:
+            return None
+        li = [kv for kv in [f.split(self.kv_splitter, 1) for f in fields] if len(kv) == 2]
+        result = {L[0]: self.fields[L[0]](L[1]) for L in li if L[0] in self.fields.keys()}
+
+        self.match_count = self.match_count + 1
+
+        for p in self.processors:
+            if isinstance(p, types.FunctionType):
+                result = p(self.name, result)
+            else:
+                result = p.process(self.name, result)
+        return result
+
+
 class PatternGroupBuilder:
     """
     build a pattern group

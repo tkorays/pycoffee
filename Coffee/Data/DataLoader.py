@@ -10,9 +10,9 @@ from rich.console import Console
 from rich.progress import Progress
 import io
 
-from Coffee.Data.DataPattern import RegexPattern, PatternGroupBuilder
+from Coffee.Data.DataExtractor import RegexPattern, PatternGroupBuilder
 from Coffee.Core.Utils import merge_datetime
-from Coffee.Data.DataPattern import PatternGroup
+from Coffee.Data.DataExtractor import PatternGroup
 from Coffee.Data.DataFlow import DataPoint, DataLoader
 
 

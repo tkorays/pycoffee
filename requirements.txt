@@ -12,4 +12,5 @@ pid
 python-daemon
 django
 h5py
+numpy
 ddt
