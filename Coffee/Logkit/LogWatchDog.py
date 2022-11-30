@@ -1,6 +1,6 @@
 from watchdog.observers.polling import PollingObserver
 from watchdog.events import FileSystemEventHandler
-from Coffee.Core.LogTail import LogTail
+from Coffee.Logkit.utils.LogTail import LogTail
 from Coffee.Core.Utils import merge_datetime
 from Coffee.Data import (
     PatternGroupBuilder, PatternGroup, RegexPattern
@@ -142,7 +142,7 @@ if __name__ == '__main__':
             return datapoint
 
 
-    LogWatchDog('./', r'.*\.log', only_new=True).set_ts_patterns(DEFAULT_TS_PATTERNS).add_pattern(
+    LogWatchDog('../Core/', r'.*\.log', only_new=True).set_ts_patterns(DEFAULT_TS_PATTERNS).add_pattern(
         RegexPattern(name="a_pattern",
                      pattern=r'(\d+),(\d+)',
                      fields={
