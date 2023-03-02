@@ -1,5 +1,9 @@
 # Copyright 2022 tkorays. All Rights Reserved.
 # Licensed to MIT under a Contributor Agreement.
+"""
+道生一，一生二，二生三，三生万物。
+万物负阴而抱阳，冲气以为和。
+"""
 
 import io
 import os
@@ -12,7 +16,8 @@ from watchdog.observers.polling import PollingObserver
 from watchdog.events import FileSystemEventHandler
 
 from coffee.data import (
-    RegexPattern, PatternGroupBuilder, PatternGroup, DataPoint, DataLoader
+    RegexPattern, PatternGroupBuilder, PatternGroup, DataPoint, DataLoader,
+    PatternMatchReporter, DatapointTimeTracker, DataSink, DEFAULT_TS_PATTERNS
 )
 from coffee.core.utils import merge_datetime
 from coffee.logkit.utils.logtail import LogTail
@@ -81,9 +86,11 @@ class LogFileDataLoader(DataLoader, PatternGroupBuilder, LineSink):
     """
     def __init__(self,
                  path: str,
-                 live_watch: str,
+                 live_watch: str = '',
                  base_datetime: datetime = datetime.now(),
                  show_progress: bool = False,
+                 show_match_result: bool = False,
+                 custom_time_tracker: DataSink = None,
                  only_new: bool = False):
         DataLoader.__init__(self)
         PatternGroupBuilder.__init__(self)
@@ -92,12 +99,21 @@ class LogFileDataLoader(DataLoader, PatternGroupBuilder, LineSink):
         self.path = os.path.abspath(path)
         self.base_datetime = base_datetime
         self.show_progress = show_progress
+        if show_match_result:
+            self.add_sink(PatternMatchReporter())
         if live_watch:
             self.event_handler = LogWatchHandler(live_watch, self, only_new)
         else:
             self.event_handler = None
         self.observer = PollingObserver()
         self.prev_datetime = None
+
+        if not custom_time_tracker:
+            self.time_tracker = DatapointTimeTracker()
+        else:
+            self.time_tracker = custom_time_tracker
+        self.add_sink(self.time_tracker)
+        self.set_ts_patterns(DEFAULT_TS_PATTERNS)
 
     def set_pattern_group(self, group: PatternGroup):
         self.pattern_group = group
@@ -199,9 +215,10 @@ if __name__ == '__main__':
 
     # r'.*\.log'
     LogFileDataLoader(
-        path='../../core/',
-        live_watch=r'.*\.log',
+        path='../core/abc.log',
+        live_watch=r'',
         show_progress=True,
+        show_match_result=True,
         only_new=False
     ).set_ts_patterns(DEFAULT_TS_PATTERNS).add_pattern(
         RegexPattern(name="a_pattern",

@@ -1,8 +1,8 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from coffee.data import DataPoint, DataAggregator, LogFileDataLoader, DEFAULT_TS_PATTERNS, RegexPattern
-
+from coffee.data import DataPoint, DataAggregator, RegexPattern
+from coffee.logkit import LogFileDataLoader
 
 class DataAggregator1(DataAggregator):
     def on_data(self, datapoint: DataPoint) -> DataPoint:
@@ -15,9 +15,7 @@ class DataAggregator1(DataAggregator):
 agg = DataAggregator1()
 
 
-LogFileDataLoader("simple.log").set_ts_patterns(
-    DEFAULT_TS_PATTERNS
-).add_pattern(
+LogFileDataLoader("simple.log").add_pattern(
     RegexPattern(name="a_pattern",
                  pattern=r'(\d+),(\d+)',
                  fields={

@@ -1,7 +1,8 @@
 # Copyright 2022 tkorays. All Rights Reserved.
 # Licensed to MIT under a Contributor Agreement.
 
-from grafanalib.core import Dashboard, Template, Templating, RowPanel, GridPos, TimeSeries, DEFAULT_TIME_PICKER, Table
+from grafanalib.core import (
+    Dashboard, Template, Templating, RowPanel, GridPos, TimeSeries, DEFAULT_TIME_PICKER, Table, Panel)
 from grafanalib._gen import DashboardEncoder
 from grafanalib.influxdb import InfluxDBTarget
 import json
@@ -44,16 +45,9 @@ def grafana_var(var_name):
 
 class InfluxQLBuilder:
     """
-    see all features at:
-    https://docs.influxdata.com/influxdb/v1.8/query_language/
-
-    simple usage:
-    ```python
-        InfluxQLBuilder(
-            measurement='measurement_id'
-        ).select('a', 'a_alis', selector='first').where(tag_filters={}).build_ts()
-    ```
-    """
+        see all features at:
+        https://docs.influxdata.com/influxdb/v1.8/query_language/
+        """
 
     def __init__(self, measurement):
         self.fields = []
@@ -65,26 +59,16 @@ class InfluxQLBuilder:
         self.fill_with = 'none'
 
     def simple_select_list(self, select_list: list):
-        """
-        simple select without `aggregator`, `selector` and `transformer`
-        """
         for v in select_list:
             self.fields.append(f'"{v}"')
         return self
 
     def first_select_list(self, select_list: list):
-        """
-        select with first `selector`
-        """
         for v in select_list:
             self.fields.append(f'first("{v}")')
         return self
 
     def custom_select_list(self, select_list: list):
-        """
-        write custom `aggregator`, `selector` and `transformer`
-        don't use this unless you are familiar with InfluxQL.
-        """
         for v in select_list:
             self.fields.append(v)
         return self
@@ -94,12 +78,6 @@ class InfluxQLBuilder:
                selector: str = 'first',
                aggregator: str = '',
                transformer: str = ''):
-        """
-        select a single filed with selector, aggregator and transformer.
-        * selector see `InfluxQL_Selectors`
-        * aggregator see `InfluxQL_Aggregators`
-        * transformer sess `InfluxQL_Transformers`
-        """
         if selector not in InfluxQL_Selectors:
             print(f'bad selector {selector}')
             selector = 'first'
@@ -110,6 +88,7 @@ class InfluxQLBuilder:
             print(f'bad transformer {transformer}')
             transformer = ''
 
+        alias = alias if alias else field_key
         field_key = f'"{field_key}"'
         if selector:
             field_key = f'{selector}({field_key})'
@@ -149,6 +128,7 @@ class InfluxQLBuilder:
         sql2 = ' AND '.join([f'"{k}"=\'{v}\'' if type(v) is str and not v.startswith('~') else f'"{k}"={v}'
                              for k, v in self.tag_filters.items()])
         sql = sql + ' AND ' + sql2 if sql1 else sql + sql2
+        sql = sql + ' AND $timeFilter'
         return sql
 
 
@@ -201,6 +181,27 @@ class GrafanaDashboardBuilder:
         ))
         return self
 
+    def add_panel(self, panel: Panel, comment: str = ''):
+        """
+        add a grafana dashboard by pure grafanalib
+        """
+        if not isinstance(panel, Panel):
+            raise Exception(f'expect a panel, but you pass `{panel}`')
+        pos = GridPos(h=8, w=24, x=self.cur_x, y=self.cur_y) if not panel.gridPos else\
+            GridPos(h=panel.gridPos.h, w=panel.gridPos.w, x=self.cur_x, y=self.cur_y)
+        # enter a new row
+        if self.cur_x + pos.w > 24:
+            self.cur_x = 0
+            self.cur_y += 1
+            pos = GridPos(h=pos.h, w=pos.w, x=self.cur_x, y=self.cur_y)
+        panel.gridPos = pos
+        self.panels.append(panel)
+        self.cur_x += panel.gridPos.w
+        if self.cur_x >= 24:
+            self.cur_x = 0
+            self.cur_y += 1
+        return self
+
     def add_row_panel(self, title: str, collapsed=False):
         self.panels.append(RowPanel(title=title, collapsed=collapsed,
                                     gridPos=GridPos(h=1, w=24, x=self.cur_x, y=self.cur_y)))
@@ -242,7 +243,7 @@ class GrafanaDashboardBuilder:
         self.cur_y += 8
         return self
 
-    def build(self):
+    def build(self, crosshair=False):
         self.dashboard = Dashboard(
             title=self.title,
             uid=self.uid,
@@ -252,7 +253,8 @@ class GrafanaDashboardBuilder:
             timePicker=DEFAULT_TIME_PICKER,
             editable=True,
             templating=Templating(list=self.templates),
-            panels=self.panels
+            panels=self.panels,
+            sharedCrosshair=crosshair
         )
         return self
 

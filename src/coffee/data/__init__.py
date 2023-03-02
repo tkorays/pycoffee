@@ -17,6 +17,7 @@ from .datastore import (
     DataStorable, DataStore, FileSystemDataStore, HDF5DataStore, DEF_DATA_STORE
 )
 from .dataviz import (
-    GrafanaDashboardBuilder, influxdb_ts_sql
+    GrafanaDashboardBuilder,
+    InfluxDBTarget, InfluxQLBuilder, grafana_var
 )
 from .TimestampPatterns import DEFAULT_TS_PATTERNS

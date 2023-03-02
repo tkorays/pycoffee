@@ -1,13 +1,15 @@
 # Copyright 2022 tkorays. All Rights Reserved.
 # Licensed to MIT under a Contributor Agreement.
-
+import webbrowser
+from grafanalib.core import TimeSeries
 from coffee.core.playbook import Playbook
 from coffee.core.settings import DEF_CFG
 from coffee.data import (
-    PatternGroupBuilder, DEFAULT_TS_PATTERNS, RegexPattern, GrafanaDashboardBuilder, influxdb_ts_sql,
-    DatapointTimeTracker, LogFileDataLoader, InfluxDBDataSink, DEF_TSDB, PatternMatchReporter
+    PatternGroupBuilder, DEFAULT_TS_PATTERNS, RegexPattern, GrafanaDashboardBuilder,
+    InfluxDBDataSink, DEF_TSDB,
+    InfluxDBTarget, InfluxQLBuilder, grafana_var
 )
-import webbrowser
+from coffee.logkit import LogFileDataLoader
 
 
 class SimplePlaybook(Playbook):
@@ -38,18 +40,18 @@ class SimplePlaybook(Playbook):
             uid='a_dashboard',
             description='description of this dashboard',
             tags=['example']
-        ).add_text_variable(
-            name="filter_a", label='A filter'
-        ).add_influx_ts_panel(
+        )
+        self.dashboard.add_text_variable(name="filter_a", label='A filter')
+        self.dashboard.add_panel(TimeSeries(
             title='show data b',
-            source=DEF_CFG.grafana_influxdb_source,
-            influx_query_list=[
-                # just show b and filter with A
-                influxdb_ts_sql(''' select first("b") as "B" from b_pattern where ("A" =~ /^$filter_a$/) ''')
+            dataSource=DEF_CFG.grafana_influxdb_source,
+            targets=[
+                InfluxDBTarget(query=InfluxQLBuilder('b_pattern').select(
+                    'b', alias='B'
+                ).where(tag_filters={'A': grafana_var('filter_a')}).build_ts())
             ]
-        ).build()
-
-        self.time_tracker = DatapointTimeTracker()
+        ))
+        self.dashboard.build(True)
 
     def prepare(self):
         # create or update grafana dashboard
@@ -60,24 +62,25 @@ class SimplePlaybook(Playbook):
     def play(self):
         # extract data from log, the log should have the format:
         # datetime-pattern data_a, data_b, for example
-        LogFileDataLoader(self.log).set_pattern_group(self.pattern_group).add_sink(
+        loader = LogFileDataLoader(
+            self.log,
+            show_progress=True,
+            show_match_result=True
+        ).set_pattern_group(
+            self.pattern_group
+        ).add_sink(
             # upload data to influxdb
             InfluxDBDataSink(DEF_TSDB)
-        ).add_sink(
-            # show regex match result
-            PatternMatchReporter()
-        ).add_sink(
-            # to track min max time
-            self.time_tracker
-        ).start()
+        )
+        loader.start()
         
         #  self.dashboard.update_dashboard(DEF_CFG.grafana_url, DEF_CFG.grafana_key)
         
         # open a new grafana page to show data
         webbrowser.open(self.dashboard.full_url(DEF_CFG.grafana_url,
                                                 vars={},
-                                                dt_from=self.time_tracker.min_ts,
-                                                dt_to=self.time_tracker.max_ts)
+                                                dt_from=loader.time_tracker.min_ts,
+                                                dt_to=loader.time_tracker.max_ts)
                         )
 
 
