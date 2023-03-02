@@ -24,6 +24,144 @@ def add_influxdb_source():
     "http://{server_addr}/api/datasources"
     pass
 
+# InfluxQL aggregator, selector and transformer.
+# see https://docs.influxdata.com/influxdb/v1.8/query_language/
+InfluxQL_Aggregators = ['', 'count', 'distinct', 'integral', 'mean', 'median', 'mode', 'spread', 'stddev', 'sum']
+InfluxQL_Selectors = ['', 'bottom', 'first', 'last', 'max', 'max', 'percentile', 'sample', 'top']
+InfluxQL_Transformers = ['', 'abs', 'acos', 'asin', 'atan', 'atan2', 'ceil', 'cos',
+                         'cumulative_sum', 'derivative', 'difference', 'elapsed', 'exp',
+                         'floor', 'histogram', 'ln', 'log', 'log2', 'log10', 'moving_average',
+                         'non_negative_derivative', 'non_negative_difference',
+                         'pow', 'round', 'sin', 'sqrt', 'tan']
+
+
+def grafana_var(var_name):
+    """
+    `grafana_var` is used in `InfluxQLBuilder`
+    """
+    return f'~/^${var_name}$/'
+
+
+class InfluxQLBuilder:
+    """
+    see all features at:
+    https://docs.influxdata.com/influxdb/v1.8/query_language/
+
+    simple usage:
+    ```python
+        InfluxQLBuilder(
+            measurement='measurement_id'
+        ).select('a', 'a_alis', selector='first').where(tag_filters={}).build_ts()
+    ```
+    """
+
+    def __init__(self, measurement):
+        self.fields = []
+        self.measurement = measurement
+        self.filters = {}
+        self.tag_filters = {}
+        self.custom_filters = {}
+        self.interval = '1s'
+        self.fill_with = 'none'
+
+    def simple_select_list(self, select_list: list):
+        """
+        simple select without `aggregator`, `selector` and `transformer`
+        """
+        for v in select_list:
+            self.fields.append(f'"{v}"')
+        return self
+
+    def first_select_list(self, select_list: list):
+        """
+        select with first `selector`
+        """
+        for v in select_list:
+            self.fields.append(f'first("{v}")')
+        return self
+
+    def custom_select_list(self, select_list: list):
+        """
+        write custom `aggregator`, `selector` and `transformer`
+        don't use this unless you are familiar with InfluxQL.
+        """
+        for v in select_list:
+            self.fields.append(v)
+        return self
+
+    def select(self, field_key: str,
+               alias: str = '',
+               selector: str = 'first',
+               aggregator: str = '',
+               transformer: str = ''):
+        """
+        select a single filed with selector, aggregator and transformer.
+        * selector see `InfluxQL_Selectors`
+        * aggregator see `InfluxQL_Aggregators`
+        * transformer sess `InfluxQL_Transformers`
+        """
+        if selector not in InfluxQL_Selectors:
+            print(f'bad selector {selector}')
+            selector = 'first'
+        if aggregator not in InfluxQL_Aggregators:
+            print(f'bad aggregator {aggregator}')
+            aggregator = ''
+        if transformer not in InfluxQL_Transformers:
+            print(f'bad transformer {transformer}')
+            transformer = ''
+
+        field_key = f'"{field_key}"'
+        if selector:
+            field_key = f'{selector}({field_key})'
+        if aggregator:
+            field_key = f'{aggregator}({field_key})'
+        if transformer:
+            field_key = f'{transformer}({field_key})'
+        if alias:
+            field_key = f'{field_key} AS "{alias}"'
+        self.fields.append(field_key)
+        return self
+
+    def where(self, filters: dict = {}, tag_filters: dict = {}):
+        if not tag_filters and not filters:
+            raise Exception("filters should be specified!")
+        self.filters = filters
+        self.tag_filters = tag_filters
+        return self
+
+    def group_by(self, interval='1s'):
+        self.interval = interval
+        return self
+
+    def fill(self, fill='none'):
+        self.fill_with = fill
+        return self
+
+    def build_ts(self):
+        sql = self.build_normal() + f' AND $timeFilter GROUP BY time({self.interval}) fill({self.fill_with})'
+        return sql
+
+    def build_normal(self):
+        sql = f'SELECT ' + ','.join(self.fields) + f' FROM "{self.measurement}" WHERE '
+        sql1 = ' AND '.join([f'"{k}"="{v}"' if type(v) is str and not v.startswith('~') else f'"{k}"={v}'
+                             for k, v in self.filters.items()])
+        sql += sql1
+        sql2 = ' AND '.join([f'"{k}"=\'{v}\'' if type(v) is str and not v.startswith('~') else f'"{k}"={v}'
+                             for k, v in self.tag_filters.items()])
+        sql = sql + ' AND ' + sql2 if sql1 else sql + sql2
+        return sql
+
+
+class DashboardBuilder:
+    def add_text_variable(self, name: str, label: str, default: str = ''):
+        pass
+
+    def add_row_panel(self, title: str, collapsed=False):
+        pass
+
+    def build(self):
+        pass
+
 
 class GrafanaDashboardBuilder:
     """

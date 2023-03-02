@@ -149,7 +149,7 @@ class GrokPattern(PatternInterface):
 
 
 class SplitPattern(PatternInterface):
-    def __init__(self, name: str, keyword: str, splitter: str, kv_splitter: str, fields: dict, tags: dict = [], processors=[], tests=[]):
+    def __init__(self, name: str, keyword: str, splitter: str, kv_splitter: str, fields: dict, tags: dict = {}, processors=[], tests=[]):
         self.name = name
         self.keyword = keyword
         self.splitter = splitter

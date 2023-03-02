@@ -1,8 +1,7 @@
-from Coffee.Data import *
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from Data import DataPoint
+from coffee.data import DataPoint, DataAggregator, LogFileDataLoader, DEFAULT_TS_PATTERNS, RegexPattern
 
 
 class DataAggregator1(DataAggregator):

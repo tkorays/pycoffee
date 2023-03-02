@@ -3,7 +3,7 @@ import os
 import tempfile
 import shutil
 import ddt
-from Coffee.Data.DataStore import FileSystemDataStore, HDF5DataStore
+from coffee.data import FileSystemDataStore, HDF5DataStore
 
 
 @ddt.ddt

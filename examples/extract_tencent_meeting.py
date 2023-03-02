@@ -1,8 +1,9 @@
-from Coffee.Data import *
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
-
+from coffee.data import (
+    DataAggregator, LogFileDataLoader, RegexPattern
+)
 
 agg = DataAggregator(append_timestamp=True)
 

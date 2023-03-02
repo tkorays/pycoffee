@@ -3,7 +3,7 @@
 import os
 from datetime import datetime
 import getpass
-from Coffee.Core.Settings import DEF_CFG
+from coffee.core.settings import DEF_CFG
 import click
 import random
 import platform

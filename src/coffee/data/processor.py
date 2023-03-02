@@ -9,12 +9,13 @@ this file provides some data processors:
 * data aggregator
 """
 
-from Coffee.Data.DataFlow import DataPoint
-from Coffee.Data.Database import InfluxDBV1
-from Coffee.Core.Utils import randstr
-from Coffee.Data.DataFlow import DataSink
+from coffee.data.dataflow import DataPoint
+from coffee.data.database import InfluxDBV1
+from coffee.core.utils import randstr
+from coffee.data.dataflow import DataSink
 
 from datetime import datetime, timedelta
+import click
 
 
 class BypassDataSink(DataSink):
@@ -100,3 +101,29 @@ class DataAggregator(DataSink):
 
     def points(self):
         return self.all_points
+
+
+class PatternMatchReporter(DataSink):
+    def __init__(self):
+        super().__init__()
+        self.result = {}
+
+    def on_data(self, datapoint: DataPoint) -> DataPoint:
+        meta = datapoint.meta
+        id = meta.get('id', '')
+        if not id:
+            return datapoint
+        if id not in self.result.keys():
+            self.result[id] = 1
+        else:
+            self.result[id] += 1
+        return datapoint
+
+    def finish(self, datapoint: DataPoint) -> DataPoint:
+        click.echo(click.style('Pattern Match Result:', fg='green', bold=True))
+        # click.echo(click.style('  {:<28s} : {}'.format('Begin Time', min_dt), fg='red'))
+        # click.echo(click.style('  {:<28s} : {}'.format('End Time', max_dt), fg='red'))
+        for k, v in self.result.items():
+            click.echo('  {:<28s} : {}'.format(k, v))
+        return datapoint
+

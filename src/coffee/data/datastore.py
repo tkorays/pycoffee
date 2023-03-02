@@ -6,7 +6,7 @@ import os
 import pickle
 import h5py
 import numpy as np
-from Coffee.Core.Settings import DEF_CFG
+from coffee.core.settings import DEF_CFG
 
 
 class DataStorable(metaclass=abc.ABCMeta):

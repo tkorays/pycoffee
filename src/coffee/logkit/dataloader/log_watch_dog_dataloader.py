@@ -1,15 +1,15 @@
-from watchdog.observers.polling import PollingObserver
-from watchdog.events import FileSystemEventHandler
-from Coffee.Logkit.utils.LogTail import LogTail
-from Coffee.Core.Utils import merge_datetime
-from Coffee.Data import (
-    PatternGroupBuilder, PatternGroup, RegexPattern
-)
-from Data import DataLoader
-from Coffee.Data.DataFlow import DataPoint, DataSink
-from datetime import datetime
 import re
 import os
+from datetime import datetime
+
+from watchdog.observers.polling import PollingObserver
+from watchdog.events import FileSystemEventHandler
+
+from coffee.logkit.utils.logtail import LogTail
+from coffee.core.utils import merge_datetime
+from coffee.data import (
+    PatternGroupBuilder, PatternGroup, RegexPattern, DataLoader, DataPoint, DataSink
+)
 
 
 class LineSink:
@@ -131,7 +131,7 @@ class LogWatchDog(DataLoader, PatternGroupBuilder, LineSink):
 
 
 if __name__ == '__main__':
-    from Coffee.Data import DEFAULT_TS_PATTERNS
+    from coffee.data import DEFAULT_TS_PATTERNS
 
     class DetailDataSink(DataSink):
         def on_data(self, datapoint: DataPoint) -> DataPoint:

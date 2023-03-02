@@ -10,10 +10,10 @@ from rich.console import Console
 from rich.progress import Progress
 import io
 
-from Coffee.Data.DataExtractor import RegexPattern, PatternGroupBuilder
-from Coffee.Core.Utils import merge_datetime
-from Coffee.Data.DataExtractor import PatternGroup
-from Coffee.Data.DataFlow import DataPoint, DataLoader
+from coffee.data.dataextractor import RegexPattern, PatternGroupBuilder
+from coffee.core.utils import merge_datetime
+from coffee.data.dataextractor import PatternGroup
+from coffee.data.dataflow import DataPoint, DataLoader
 
 
 class LogFileDataLoader(DataLoader, PatternGroupBuilder):

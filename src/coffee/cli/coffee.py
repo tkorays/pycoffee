@@ -11,8 +11,8 @@ if __name__ == "__main__":
     sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
 
-from Coffee.Core.Settings import DEF_CFG
-from Coffee.Core.Playbook import PlaybookCommandLoader
+from coffee.core.settings import DEF_CFG
+from coffee.core.playbook import PlaybookCommandLoader
 
 
 CWD = os.path.split(os.path.realpath(__file__))[0]
@@ -112,11 +112,11 @@ if not os.path.exists(DEF_CFG.data_store_path):
 
 # load internal playbooks
 PlaybookCommandLoader(coffee).load_multi([
-    'Coffee.Playbook.PowerToys'
+    'coffee.playbook.powertoys'
 ])
 # load local playbooks for debug
 PlaybookCommandLoader(coffee_play).load_custom_plays(
-    os.path.join(CWD, '../../CoffeePlaybooks')
+    os.path.join(CWD, '../../../CoffeePlaybooks')
 )
 # load custom playbooks
 PlaybookCommandLoader(coffee_play).load_custom_plays(DEF_CFG.plays_path)
