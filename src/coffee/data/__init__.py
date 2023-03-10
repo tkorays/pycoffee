@@ -20,4 +20,4 @@ from .dataviz import (
     GrafanaDashboardBuilder,
     InfluxDBTarget, InfluxQLBuilder, grafana_var
 )
-from .TimestampPatterns import DEFAULT_TS_PATTERNS
+from .patterns import DEFAULT_TS_PATTERNS
