@@ -10,7 +10,7 @@ import os
 import io
 from datetime import timedelta, datetime
 
-from Coffee.Core.Utils import web_page_compare
+from coffee.core.utils import web_page_compare
 
 '''
 @click.command("nbclock", help="[in] net based clock")

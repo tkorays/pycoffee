@@ -17,7 +17,7 @@ from watchdog.events import FileSystemEventHandler
 
 from coffee.data import (
     RegexPattern, PatternGroupBuilder, PatternGroup, DataPoint, DataLoader,
-    PatternMatchReporter, DatapointTimeTracker, DataSink, DEFAULT_TS_PATTERNS
+    PatternMatchReporter, DatapointTimeTracker, DataSink
 )
 from coffee.core.utils import merge_datetime
 from coffee.logkit.utils.logtail import LogTail
@@ -65,7 +65,7 @@ class LogFileDataLoader(DataLoader, PatternGroupBuilder, LineSink):
     extract data from log.
 
     example for live loading:
-    ```
+    ```python
     LogFileDataLoader(
         path='../../core/',
         live_watch=r'.*\.log',
@@ -75,7 +75,7 @@ class LogFileDataLoader(DataLoader, PatternGroupBuilder, LineSink):
     ```
 
     example for offline loading:
-    ```
+    ```python
     LogFileDataLoader(
         path='../../core/abc.log',
         live_watch='',

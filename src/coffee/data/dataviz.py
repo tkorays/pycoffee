@@ -25,6 +25,7 @@ def add_influxdb_source():
     "http://{server_addr}/api/datasources"
     pass
 
+
 # InfluxQL aggregator, selector and transformer.
 # see https://docs.influxdata.com/influxdb/v1.8/query_language/
 InfluxQL_Aggregators = ['', 'count', 'distinct', 'integral', 'mean', 'median', 'mode', 'spread', 'stddev', 'sum']
@@ -132,21 +133,11 @@ class InfluxQLBuilder:
         return sql
 
 
-class DashboardBuilder:
-    def add_text_variable(self, name: str, label: str, default: str = ''):
-        pass
-
-    def add_row_panel(self, title: str, collapsed=False):
-        pass
-
-    def build(self):
-        pass
-
-
 class GrafanaDashboardBuilder:
     """
     Utils class for creating dashboard for grafana.
     """
+
     def __init__(self, title: str, uid: str, description: str, tags: list):
         self.title = title
         self.uid = uid
@@ -187,7 +178,7 @@ class GrafanaDashboardBuilder:
         """
         if not isinstance(panel, Panel):
             raise Exception(f'expect a panel, but you pass `{panel}`')
-        pos = GridPos(h=8, w=24, x=self.cur_x, y=self.cur_y) if not panel.gridPos else\
+        pos = GridPos(h=8, w=24, x=self.cur_x, y=self.cur_y) if not panel.gridPos else \
             GridPos(h=panel.gridPos.h, w=panel.gridPos.w, x=self.cur_x, y=self.cur_y)
         # enter a new row
         if self.cur_x + pos.w > 24:
@@ -281,40 +272,3 @@ class GrafanaDashboardBuilder:
     def full_url(self, server_addr: str, vars: dict, dt_from: int, dt_to: int):
         v = '&'.join([f'var-{k}={v}' for k, v in vars.items()])
         return f'{self.url(server_addr)}?orgId=1&{v}&from={dt_from}&to={dt_to}'
-
-    @staticmethod
-    def override_hide_field(field):
-        return {
-            "matcher": {
-              "id": "byName",
-              "options": field
-            },
-            "properties": [
-              {
-                "id": "custom.hidden",
-                "value": True
-              }
-            ]
-          }
-
-    @staticmethod
-    def overrides_display_link(link_name, override_field, link_field):
-        return {
-            "matcher": {
-              "id": "byName",
-              "options": override_field
-            },
-            "properties": [
-              {
-                "id": "links",
-                "value": [
-                  {
-                    "targetBlank": False,
-                    "title": link_name,
-                    "url": "${__data.fields." + link_field + "}"
-                  }
-                ]
-              }
-            ]
-          }
-
